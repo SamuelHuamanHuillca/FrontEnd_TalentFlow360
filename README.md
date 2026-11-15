@@ -7,8 +7,8 @@ Aplicación Angular 22 standalone, TypeScript estricto y SASS/SCSS para práctic
 Requisitos: Node 24.15 o posterior compatible con Angular 22 y npm 11. El proyecto fue validado con Node 24.19.0.
 
 ```powershell
-git clone https://github.com/EscuderoRodasJean/Front_TalentFlow360.git
-cd Front_TalentFlow360
+git clone https://github.com/SamuelHuamanHuillca/FrontEnd_TalentFlow360.git
+cd FrontEnd_TalentFlow360
 npm ci
 npm start
 ```
@@ -17,7 +17,7 @@ Abrir http://localhost:4200. `proxy.conf.json` envía `/api` al backend de Rende
 
 ## Colaboración
 
-Repositorio público: [Front_TalentFlow360](https://github.com/EscuderoRodasJean/Front_TalentFlow360). Cualquier persona puede consultar el código y proponer cambios mediante un fork y pull request. Para subir cambios directamente necesita una cuenta de GitHub invitada como colaboradora; GitHub no admite permisos de escritura anónimos por enlace.
+Repositorio principal: [FrontEnd_TalentFlow360](https://github.com/SamuelHuamanHuillca/FrontEnd_TalentFlow360). Cualquier persona puede consultar el código y proponer cambios mediante un fork y pull request. Para subir cambios directamente necesita una cuenta de GitHub invitada como colaboradora; GitHub no admite permisos de escritura anónimos por enlace.
 
 Para backend local, cambiar únicamente el target del proxy a `http://localhost:8080` y reiniciar `npm start`. La URL de producción se configura en `public/config.json` antes del build o en el archivo `config.json` del hosting. Usar `{"apiBaseUrl":"https://bakend-talentflow360.onrender.com/api"}` cuando frontend y backend estén en dominios diferentes. Ese origen debe autorizarse en el CORS de Spring. No poner secretos en este archivo.
 
