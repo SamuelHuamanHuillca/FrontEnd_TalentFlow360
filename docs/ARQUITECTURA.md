@@ -4,12 +4,16 @@
 
 Angular 22 ya era la versión del repositorio. Se conservó y se añadieron componentes standalone con carga diferida, TypeScript y plantillas estrictas, formularios reactivos y SASS. Las plantillas HTML y el CSS compilado son parte de Angular; el código de comportamiento es TypeScript. No hay una aplicación paralela en HTML/JS ni un framework distinto.
 
-Se separa por capacidades de negocio, con infraestructura compartida en `core` y componentes reutilizables en `shared`. Cada componente presenta datos y recoge acciones; `TalentApi` describe los contratos de negocio, `ApiClient` resuelve transporte y el backend aplica las reglas y transacciones. Los DTO de `models.ts` conservan los nombres JSON del Java actual. Las propiedades opcionales permiten tolerar campos ausentes; los formularios de escritura aplican los obligatorios.
+Se sigue la organización del ejemplo de clase `EjemploAngularArquitectura.zip`: `pages` contiene las pantallas, `components` los elementos reutilizables, `models` los contratos por entidad y `data` los catálogos/configuraciones estáticas. `services`, `guards` e `interceptors` completan la conexión REST y la seguridad que necesita TalentFlow360. Cada componente tiene archivos `.ts`, `.html` y `.scss` separados, incluido el componente raíz.
+
+Cada componente presenta datos y recoge acciones; `services/talent-api.service.ts` describe los contratos de negocio, `services/api-client.service.ts` resuelve transporte y el backend aplica las reglas y transacciones. Los DTO de `models/` conservan los nombres JSON del Java actual. `models/index.ts` reúne exportaciones de tipos para el cliente de API; las pantallas importan sus modelos por entidad. Las propiedades opcionales permiten tolerar campos ausentes; los formularios de escritura aplican los obligatorios. El catálogo de empresas, los campos de perfil y las transiciones están en `data/`; los usuarios, perfiles, vacantes y postulaciones se consultan en Spring.
+
+El ejemplo de clase usa Angular 20.3 y cubre rutas/comunicación hasta la clase 12. Se conserva Angular 22 del repositorio de TalentFlow360; reorganizar las carpetas no requiere cambiar de versión ni retirar formularios, autenticación o consumo REST. No se han cambiado las URLs de navegación ni el diseño del portal.
 
 ```mermaid
 flowchart LR
     P[Postulante y equipo] --> R[Router Angular y guards]
-    R --> F[Features con componentes standalone]
+    R --> F[Pages y components standalone]
     F --> RF[Reactive Forms y validadores]
     F --> T[TalentApi tipado]
     T --> C[ApiClient / HttpClient]

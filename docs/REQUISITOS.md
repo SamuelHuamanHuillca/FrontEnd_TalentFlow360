@@ -22,8 +22,8 @@ La columna de interfaz indica implementación Angular contra el contrato actual.
 
 | Tema | Evidencia |
 |---|---|
-| Fundamentos / generación de componentes | Componentes standalone con `@Component`; se pueden generar nuevas features con `npx ng generate component features/nueva --style=scss` |
-| SASS | Variables, anidación y breakpoints en `src/styles.scss`; estilos por componente `.scss` y schematic configurado |
+| Fundamentos / generación de componentes | Componentes standalone con `@Component` y archivos separados; nuevas páginas con `npx ng generate component pages/nueva --style=scss` y elementos reutilizables en `components/` |
+| SASS | Variables en `src/styles/_tokens.scss`, estilos globales en `src/styles.scss`, estilos por componente `.scss` y schematic configurado |
 | Rutas | `app.routes.ts`, lazy `loadComponent`, authGuard y roleGuard |
 | Comunicación | DataForm y ArrayEditor reciben `input()` y emiten `output()` hacia sus padres |
 | Formularios | ReactiveFormsModule, FormGroup, FormControl y validadores por campo y rango |

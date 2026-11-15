@@ -12,7 +12,7 @@ La sección de empresas de la portada muestra los logos oficiales de Alicorp, Ba
 
 ## Datos y límites del contrato actual
 
-El backend no tiene una entidad ni un endpoint de empresas: `VacanteDTO.empresa` es un texto. Por ello, los perfiles públicos están en `company-catalog.ts`; son información corporativa, no cuentas empresariales ni registros de la BD. No implican una alianza con TalentFlow360. Los nombres equivalentes admitidos están definidos en `aliases`; no se usa coincidencia parcial para evitar atribuir una vacante a otra organización.
+El backend no tiene una entidad ni un endpoint de empresas: `VacanteDTO.empresa` es un texto. Por ello, los perfiles públicos están en `data/empresas.data.ts` y su contrato en `models/empresa.ts`; son información corporativa, no cuentas empresariales ni registros de la BD. No implican una alianza con TalentFlow360. Los nombres equivalentes admitidos están definidos en `aliases`; no se usa coincidencia parcial para evitar atribuir una vacante a otra organización.
 
 `CompanyVacancies` consulta `GET /vacantes` cuando existe una sesión válida y conserva únicamente las vacantes `PUBLICADA`. Sin sesión no realiza esta petición y muestra un enlace para ingresar. Una respuesta fallida ofrece reintentar; no se transforma el fallo en un contador de cero. Al cerrar sesión se eliminan los resultados. El login conserva el retorno al directorio o a la ficha.
 

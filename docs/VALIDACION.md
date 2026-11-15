@@ -1,10 +1,10 @@
 # Validación del frontend
 
-Validación local del 14/11/2026. Node 24.19.0, Angular 22.2, Vitest 5.1 y Playwright 1.65 con Chromium. No se han usado credenciales de Render ni se han realizado escrituras en la instancia desplegada.
+Validación local del 15/11/2026, tras reorganizar según el ejemplo de clase. Node 24.19.0, Angular 22.2, Vitest 5.1 y Playwright 1.65 con Chromium. No se han usado credenciales de Render ni se han realizado escrituras en la instancia desplegada. Las comprobaciones se ejecutan localmente, sin GitHub Actions.
 
 | Comprobación | Resultado |
 |---|---|
-| `npm run build` | Correcto. Bundle inicial 306,27 kB, transferencia estimada 84,66 kB, rutas diferidas |
+| `npm run build` | Correcto. Bundle inicial 306,27 kB, transferencia estimada 84,67 kB, rutas diferidas |
 | `npm run test:unit` | 47 pruebas correctas, 5 archivos, sin errores no controlados |
 | `npm run test:e2e` | 21 recorridos correctos, 1 worker, 29 s aproximadamente |
 | `npm run format:check` | Correcto |
@@ -40,7 +40,7 @@ Los recorridos de navegador sustituyen `/api/**` por contratos aislados. Demuest
 - Se conserva el perfil actualizado al cambiar entre sus apartados.
 - Los porcentajes sin observaciones se presentan con un guion en vez de afirmar que un cero cumple una meta.
 
-La suite completa pasó con 47 pruebas unitarias y 21 recorridos de navegador. Tras elegir la variante a color del logo de Gloria y ajustar el contraste de las fichas se repitieron el build y los cinco recorridos de empresas, regenerando las capturas finales.
+Tras trasladar las pantallas a `pages`, extraer plantillas/estilos, separar modelos por entidad y actualizar importaciones/rutas, se repitieron el build, las 47 pruebas unitarias y los 21 recorridos de navegador. Se conservan los recorridos de registro, perfil, selección, seguridad y empresas.
 
 ## Rediseño del portal
 

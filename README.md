@@ -37,22 +37,27 @@ Playwright inicia un servidor local y sustituye `/api/**` por una API de prueba 
 
 ```text
 src/app/
-  core/api/             contratos, configuración y cliente REST tipado
-  core/auth/            sesión, guards y permisos
-  core/feedback/        avisos compartidos
-  layout/               navegación por rol y diseño adaptable
-  shared/forms/         formularios reactivos y listas de criterios
-  shared/ui/            iconos, estados, carga y errores
-  features/
-    welcome/ companies/ auth/ home/
-    profile/ vacancies/ applications/
-    interviews/ evaluations/ dashboard/ users/
+  pages/                portada, acceso, perfil, vacantes, postulaciones,
+                        entrevistas, evaluaciones, indicadores, usuarios y empresas
+  components/           cabecera, layout, footer, tarjetas, carrusel,
+                        buscador, formularios, iconos y estados compartidos
+  models/               contratos por entidad: usuario, postulante, vacante,
+                        postulación, entrevista, evaluación y respuesta de API
+  data/                 catálogo de empresas, campos de perfil y transiciones
+  services/             cliente REST, API de negocio, sesión y avisos
+  guards/               protección de rutas por sesión y rol
+  interceptors/         token JWT y tratamiento de errores HTTP
+  app.ts/html/scss       componente raíz con archivos separados
+  app.routes.ts         rutas públicas y privadas
+src/styles/_tokens.scss variables SCSS, como en el ejemplo de clase
 e2e/                    contratos de prueba y recorridos de navegador
 docs/                   arquitectura, cobertura y datos históricos
 scripts/                consultas de inventario de datos, de solo lectura
 ```
 
 Los componentes se cargan por ruta. El JWT se conserva en memoria y se elimina al cerrar sesión o recargar. Se comprueba expiración al navegar y antes de enviar peticiones. Un 401 de recurso cierra la sesión; un 403 mantiene la sesión y explica la falta de permiso. El token solo se adjunta al backend configurado. No hay refresh token porque el backend no ofrece ese contrato.
+
+La organización sigue el ejemplo `EjemploAngularArquitectura.zip` de clase: páginas, componentes, modelos y datos. Se amplía con servicios, guards e interceptores porque TalentFlow360 consume Spring Boot y utiliza JWT. Cada página y componente tiene su `.ts`, `.html` y `.scss`; los datos del proceso siguen llegando de la API.
 
 ## Diseño del portal
 
