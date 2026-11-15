@@ -1,0 +1,31 @@
+<div class="stack">
+  @for (item of items(); track $index) {
+    <div class="row between">
+      <span
+        >{{ item['nombre'] }}
+        @if (item['pesoMatching']) {
+          · Peso {{ item['pesoMatching'] }}
+        }
+        @if (item['puntaje'] !== undefined) {
+          · {{ item['puntaje'] }} / {{ item['puntajeMaximo'] }}
+        }</span
+      ><button
+        type="button"
+        class="btn quiet"
+        (click)="remove($index)"
+        [attr.aria-label]="'Quitar ' + item['nombre']"
+      >
+        Quitar
+      </button>
+    </div>
+  }
+</div>
+<details [open]="items().length === 0">
+  <summary>Agregar {{ label() }}</summary>
+  <tf-data-form
+    [prefix]="label()"
+    [fields]="fields()"
+    label="Agregar a la lista"
+    (submitted)="add($event)"
+  />
+</details>

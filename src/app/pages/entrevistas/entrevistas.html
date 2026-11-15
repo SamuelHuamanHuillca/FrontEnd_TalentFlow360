@@ -1,0 +1,88 @@
+<header class="page-head">
+  <div>
+    <p class="eyebrow">ENCUENTROS QUE ABREN PUERTAS</p>
+    <h1>Una agenda con espacio para todos.</h1>
+    <p>
+      Consulta una postulación o tu agenda asignada. El servidor valida conflictos antes de agendar.
+    </p>
+  </div>
+</header>
+<div class="filters">
+  <div class="field">
+    <label for="interview-scope">Consultar por</label
+    ><select id="interview-scope" [ngModel]="scope()" (ngModelChange)="scope.set($event)">
+      <option value="evaluador">Evaluador</option>
+      <option value="postulacion">Postulación</option>
+    </select>
+  </div>
+  <div class="field">
+    <label for="interview-id">{{
+      scope() === 'evaluador' ? 'Evaluador de consulta (ID)' : 'Postulación de consulta (ID)'
+    }}</label><input
+      id="interview-id"
+      type="number"
+      min="1"
+      [(ngModel)]="lookupId"
+      [disabled]="auth.role() === 'EVALUADOR' && scope() === 'evaluador'"
+    />
+  </div>
+  <button class="btn secondary" (click)="load()">Consultar agenda</button>
+</div>
+<tf-async-state [loading]="loading()" [error]="error()" (retry)="load()" />
+<section class="panel table-wrap">
+  <table>
+    <thead>
+      <tr>
+        <th>Postulante</th>
+        <th>Evaluador</th>
+        <th>Inicio</th>
+        <th>Fin</th>
+        <th>Estado</th>
+        <th>Actualizar</th>
+      </tr>
+    </thead>
+    <tbody>
+      @for (i of rows(); track i.id) {
+        <tr>
+          <td>{{ i.postulanteNombre }}</td>
+          <td>{{ i.evaluadorNombre }}</td>
+          <td>{{ i.fechaHoraInicio | date: 'dd/MM/yyyy HH:mm' }}</td>
+          <td>{{ i.fechaHoraFin | date: 'HH:mm' }}</td>
+          <td><tf-status [value]="i.estado" /></td>
+          <td>
+            <select
+              [attr.aria-label]="'Estado de entrevista ' + i.id"
+              [ngModel]="i.estado"
+              (ngModelChange)="update(i.id!, $event)"
+            >
+              @for (s of states; track s) {
+                <option>{{ s }}</option>
+              }
+            </select>
+          </td>
+        </tr>
+      } @empty {
+        <tr>
+          <td colspan="6">No hay entrevistas para la consulta.</td>
+        </tr>
+      }
+    </tbody>
+  </table>
+</section>
+@if (actionError()) {
+  <p class="auth-message" role="alert">{{ actionError() }}</p>
+}
+@if (auth.has(recruiters)) {
+  <section class="panel spaced">
+    <h2>Agendar una entrevista</h2>
+    <p>
+      Horarios expresados en la zona local del proceso. Evita cruces entre postulante y evaluador.
+    </p>
+    <tf-data-form
+      [fields]="fields"
+      [busy]="busy()"
+      label="Agendar entrevista"
+      (submitted)="schedule($event)"
+    />
+  </section>
+}

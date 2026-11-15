@@ -1,0 +1,23 @@
+<form
+  class="opportunity-search"
+  [class.vertical]="vertical()"
+  [formGroup]="form"
+  (ngSubmit)="search()"
+>
+  <label class="query-control"
+    ><tf-icon name="search" /><span class="sr-only">Puesto, empresa o palabra clave</span
+    ><input
+      formControlName="query"
+      placeholder="Puesto, empresa o palabra clave"
+      maxlength="150" /></label
+  ><label class="location-control"
+    ><tf-icon name="pin" /><span class="sr-only">Lugar de trabajo</span
+    ><select formControlName="location">
+      <option value="">Todo el Perú</option>
+      <option>Lima</option>
+      <option>Arequipa</option>
+      <option>Trujillo</option>
+      <option>Cusco</option>
+    </select></label
+  ><button class="btn primary" type="submit">Buscar prácticas <tf-icon name="arrow" /></button>
+</form>

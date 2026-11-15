@@ -1,0 +1,13 @@
+<span class="company-logo" [style.background]="company().logoBackground || '#fff'">
+  @if (!failed()) {
+    <img
+      [src]="company().logo"
+      [alt]="'Logo oficial de ' + company().name"
+      [attr.loading]="eager() ? 'eager' : 'lazy'"
+      decoding="async"
+      (error)="failed.set(true)"
+    />
+  } @else {
+    <strong>{{ company().name }}</strong>
+  }
+</span>

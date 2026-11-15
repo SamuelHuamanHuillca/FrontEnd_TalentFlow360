@@ -1,0 +1,30 @@
+<footer class="portal-footer">
+  <div class="footer-content">
+    <section>
+      <tf-brand />
+      <p>
+        El comienzo de tu historia profesional.<br />Prácticas con criterios claros y seguimiento de
+        principio a fin.
+      </p>
+    </section>
+    <section>
+      <h2>Para tu siguiente paso</h2>
+      <a routerLink="/registro">Crear mi perfil</a
+      ><a routerLink="/app/vacantes">Explorar oportunidades</a
+      ><a routerLink="/app/postulaciones">Seguir mis postulaciones</a>
+    </section>
+    <section>
+      <h2>Sobre TalentFlow360</h2>
+      <a routerLink="/empresas">Conocer empresas</a
+      ><a routerLink="/" fragment="como-funciona">Cómo funciona</a
+      ><a routerLink="/" fragment="matching">Matching explicable</a
+      ><a routerLink="/ingresar" [queryParams]="{ acceso: 'equipo' }"
+        >Acceso del equipo de selección</a
+      >
+    </section>
+  </div>
+  <div class="footer-bottom">
+    <span>© {{ year }} TalentFlow360.</span
+    ><span>Hecho para conectar talento y oportunidades.</span>
+  </div>
+</footer>

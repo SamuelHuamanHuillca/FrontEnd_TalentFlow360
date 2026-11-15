@@ -1,0 +1,98 @@
+<header class="page-head">
+  <div>
+    <p class="eyebrow">CADA PASO CUENTA</p>
+    <h1>
+      {{
+        auth.role() === 'POSTULANTE'
+          ? 'Tus procesos, a la vista.'
+          : 'El talento está en movimiento.'
+      }}
+    </h1>
+    <p>Consulta el estado, el score explicable y el historial de cada postulación.</p>
+  </div>
+</header>
+@if (auth.role() !== 'POSTULANTE' && auth.role() !== 'EVALUADOR') {
+  <div class="filters">
+    <div class="field">
+      <label for="vacancy-scope">Selecciona una vacante</label
+      ><select
+        id="vacancy-scope"
+        [ngModel]="vacancyId()"
+        (ngModelChange)="vacancyId.set(+$event); loadScoped()"
+      >
+        <option value="0">Selecciona una vacante</option>
+        @for (v of vacancies(); track v.id) {
+          <option [value]="v.id">{{ v.titulo }} · {{ v.empresa }}</option>
+        }
+      </select>
+    </div>
+  </div>
+}
+<div class="filters">
+  <div class="field">
+    <label for="application-search">Buscar en los resultados</label
+    ><input
+      id="application-search"
+      placeholder="Nombre o vacante"
+      [ngModel]="query()"
+      (ngModelChange)="query.set($event); page.set(1)"
+    />
+  </div>
+</div>
+<tf-async-state [loading]="loading()" [error]="error()" (retry)="load()" />
+@if (!loading() && !error()) {
+  <section class="panel table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>Postulante</th>
+          <th>Vacante</th>
+          <th>Estado</th>
+          <th>Compatibilidad</th>
+          <th>Fecha</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (a of visible(); track a.id) {
+          <tr>
+            <td>
+              <strong>{{ a.postulanteNombre }}</strong>
+            </td>
+            <td>{{ a.vacanteTitulo }}</td>
+            <td><tf-status [value]="a.estado" /></td>
+            <td>{{ a.scoreCompatibilidad?.toFixed(1) }}%</td>
+            <td>{{ a.fechaPostulacion | date: 'dd/MM/yyyy' }}</td>
+            <td>
+              <a class="btn secondary" [routerLink]="['/app/postulaciones', a.id]">Ver proceso</a>
+            </td>
+          </tr>
+        } @empty {
+          <tr>
+            <td colspan="6">
+              {{
+                vacancyId() || auth.role() === 'POSTULANTE' || auth.role() === 'EVALUADOR'
+                  ? 'No hay postulaciones para esta consulta.'
+                  : 'Selecciona una vacante para ver su proceso.'
+              }}
+            </td>
+          </tr>
+        }
+      </tbody>
+    </table>
+    <div class="pagination">
+      <span>{{ filtered().length }} postulaciones · Página {{ page() }}</span>
+      <div class="row">
+        <button class="btn secondary" [disabled]="page() === 1" (click)="page.set(page() - 1)">
+          Anterior</button
+        ><button
+          class="btn secondary"
+          [disabled]="page() * 15 >= filtered().length"
+          (click)="page.set(page() + 1)"
+        >
+          Siguiente
+        </button>
+      </div>
+    </div>
+  </section>
+}

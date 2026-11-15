@@ -1,0 +1,113 @@
+<header class="page-head">
+  <div>
+    <p class="eyebrow">PERSONAS Y RESPONSABILIDADES</p>
+    <h1>El equipo detrás de cada paso.</h1>
+    <p>Gestiona cuentas con roles explícitos y conserva el historial al desactivarlas.</p>
+  </div>
+  <button class="btn primary" (click)="create()">Agregar cuenta</button>
+</header>
+<div class="filters">
+  <div class="field search">
+    <label for="user-search">Buscar persona</label
+    ><input id="user-search" [ngModel]="query()" (ngModelChange)="query.set($event); page.set(1)" />
+  </div>
+  <div class="field">
+    <label for="role-filter">Rol</label
+    ><select id="role-filter" [ngModel]="role()" (ngModelChange)="role.set($event); page.set(1)">
+      <option value="">Todos los roles</option>
+      @for (r of roles; track r) {
+        <option>{{ r }}</option>
+      }
+    </select>
+  </div>
+</div>
+<tf-async-state [loading]="loading()" [error]="error()" (retry)="load()" />
+<section class="panel table-wrap">
+  <table>
+    <thead>
+      <tr>
+        <th>Persona</th>
+        <th>Correo</th>
+        <th>Rol</th>
+        <th>Estado</th>
+        <th>Acciones</th>
+      </tr>
+    </thead>
+    <tbody>
+      @for (u of visible(); track u.id) {
+        <tr>
+          <td>
+            <strong>{{ u.nombre }} {{ u.apellido }}</strong>
+          </td>
+          <td>{{ u.email }}</td>
+          <td>{{ u.rol }}</td>
+          <td>
+            <span class="badge" [class.positive]="u.activo">{{
+              u.activo ? 'Activo' : 'Inactivo'
+            }}</span>
+          </td>
+          <td>
+            <div class="row">
+              <span
+                class="muted"
+                title="El contrato PUT actual exige una contraseña que el servicio ignora. Requiere corrección en backend."
+                >Edición pendiente de API</span
+              >
+              @if (
+                auth.role() === 'ADMINISTRADOR' && u.activo && u.id !== auth.session()?.usuarioId
+              ) {
+                <button class="btn quiet" (click)="confirm.set(u)">Desactivar</button>
+              }
+            </div>
+          </td>
+        </tr>
+      } @empty {
+        <tr>
+          <td colspan="5">No hay cuentas para esta búsqueda.</td>
+        </tr>
+      }
+    </tbody>
+  </table>
+  <div class="pagination">
+    <span>{{ filtered().length }} cuentas · Página {{ page() }}</span>
+    <div class="row">
+      <button class="btn secondary" [disabled]="page() === 1" (click)="page.set(page() - 1)">
+        Anterior</button
+      ><button
+        class="btn secondary"
+        [disabled]="page() * 15 >= filtered().length"
+        (click)="page.set(page() + 1)"
+      >
+        Siguiente
+      </button>
+    </div>
+  </div>
+</section>
+@if (confirm(); as user) {
+  <section class="panel spaced" role="alert">
+    <h2>¿Desactivar a {{ user.nombre }}?</h2>
+    <p>La cuenta perderá acceso. Se conservará su historial.</p>
+    <div class="row">
+      <button class="btn danger" [disabled]="busy()" (click)="deactivate(user.id!)">
+        Confirmar desactivación</button
+      ><button class="btn secondary" (click)="confirm.set(null)">Cancelar</button>
+    </div>
+  </section>
+}
+@if (actionError()) {
+  <p class="auth-message" role="alert">{{ actionError() }}</p>
+}
+@if (showForm()) {
+  <section class="panel spaced">
+    <div class="row between">
+      <h2>{{ editing() ? 'Editar cuenta' : 'Agregar una persona' }}</h2>
+      <button class="btn quiet" (click)="showForm.set(false)">Cerrar</button>
+    </div>
+    <tf-data-form
+      [fields]="fields()"
+      [values]="values()"
+      [busy]="busy()"
+      (submitted)="save($event)"
+    />
+  </section>
+}

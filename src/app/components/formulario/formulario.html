@@ -1,0 +1,65 @@
+<form [formGroup]="form()" (ngSubmit)="submit()" novalidate class="data-form">
+  @for (f of fields(); track f.key) {
+    <div class="field" [class.full]="f.type === 'textarea'">
+      <label [for]="prefix() + '-' + f.key"
+        >{{ f.label }}
+        @if (f.required) {
+          <span aria-hidden="true">*</span>
+        }
+      </label>
+      @if (f.options) {
+        <select
+          [id]="prefix() + '-' + f.key"
+          [formControlName]="f.key"
+          [attr.aria-label]="f.label"
+          [attr.aria-describedby]="prefix() + '-' + f.key + '-help'"
+        >
+          <option value="">Selecciona una opción</option>
+          @for (o of f.options; track o) {
+            <option [value]="o">{{ o.replaceAll('_', ' ') }}</option>
+          }
+        </select>
+      } @else if (f.type === 'textarea') {
+        <textarea
+          [id]="prefix() + '-' + f.key"
+          [formControlName]="f.key"
+          [attr.aria-label]="f.label"
+          rows="4"
+          [attr.aria-describedby]="prefix() + '-' + f.key + '-help'"
+        ></textarea>
+      } @else if (f.type === 'checkbox') {
+        <input
+          [id]="prefix() + '-' + f.key"
+          type="checkbox"
+          [formControlName]="f.key"
+          [attr.aria-label]="f.label"
+        />
+      } @else {
+        <input
+          [id]="prefix() + '-' + f.key"
+          [type]="f.type || 'text'"
+          [formControlName]="f.key"
+          [attr.aria-label]="f.label"
+          [attr.min]="f.min ?? null"
+          [attr.max]="f.max ?? null"
+          [attr.autocomplete]="
+            f.type === 'password' ? 'current-password' : f.key === 'email' ? 'email' : 'off'
+          "
+          [attr.aria-describedby]="prefix() + '-' + f.key + '-help'"
+          [attr.aria-invalid]="invalid(f.key)"
+        />
+      }
+      <small [id]="prefix() + '-' + f.key + '-help'" [class.invalid]="invalid(f.key)">{{
+        invalid(f.key) ? message(f) : f.hint || ''
+      }}</small>
+    </div>
+  }
+  @if (form().hasError('dateOrder')) {
+    <p class="invalid full" role="alert">La fecha de fin debe ser posterior a la de inicio.</p>
+  }
+  <div class="full form-actions">
+    <button class="btn primary" type="submit" [disabled]="busy()">
+      {{ busy() ? 'Guardando…' : label() }}
+    </button>
+  </div>
+</form>

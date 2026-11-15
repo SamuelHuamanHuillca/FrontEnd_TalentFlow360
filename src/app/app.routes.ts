@@ -1,30 +1,31 @@
 import { Routes } from '@angular/router';
-import { MANAGERS, STAFF, RECRUITERS } from './core/auth/auth-store';
-import { authGuard, roleGuard } from './core/auth/auth-guards';
+import { MANAGERS, STAFF, RECRUITERS } from './services/auth.service';
+import { authGuard, roleGuard } from './guards/auth.guard';
 export const routes: Routes = [
   {
     path: 'empresas',
-    loadComponent: () => import('./features/companies/companies-page').then((m) => m.CompaniesPage),
+    loadComponent: () => import('./pages/empresas/empresas').then((m) => m.CompaniesPage),
     title: 'Empresas · TalentFlow360',
   },
   {
     path: 'empresas/:slug',
-    loadComponent: () => import('./features/companies/company-detail').then((m) => m.CompanyDetail),
+    loadComponent: () =>
+      import('./pages/detalle-empresa/detalle-empresa').then((m) => m.CompanyDetail),
     title: 'Conoce la empresa · TalentFlow360',
   },
   {
     path: '',
-    loadComponent: () => import('./features/welcome/welcome').then((m) => m.Welcome),
+    loadComponent: () => import('./pages/portada/portada').then((m) => m.Welcome),
     title: 'TalentFlow360 · Tu siguiente paso',
   },
   {
     path: 'ingresar',
-    loadComponent: () => import('./features/auth/auth-page').then((m) => m.AuthPage),
+    loadComponent: () => import('./pages/acceso/acceso').then((m) => m.AuthPage),
     title: 'Ingresar · TalentFlow360',
   },
   {
     path: 'registro',
-    loadComponent: () => import('./features/auth/auth-page').then((m) => m.AuthPage),
+    loadComponent: () => import('./pages/acceso/acceso').then((m) => m.AuthPage),
     data: { register: true },
     title: 'Crear cuenta · TalentFlow360',
   },
@@ -32,72 +33,73 @@ export const routes: Routes = [
     path: 'app',
     canActivate: [authGuard],
     canActivateChild: [roleGuard],
-    loadComponent: () => import('./layout/shell').then((m) => m.Shell),
+    loadComponent: () => import('./components/layout/layout').then((m) => m.Shell),
     children: [
       { path: '', pathMatch: 'full', redirectTo: 'inicio' },
       {
         path: 'inicio',
-        loadComponent: () => import('./features/home/home').then((m) => m.Home),
+        loadComponent: () => import('./pages/inicio/inicio').then((m) => m.Home),
         title: 'Mi espacio · TalentFlow360',
       },
       {
         path: 'vacantes',
-        loadComponent: () => import('./features/vacancies/vacancies').then((m) => m.Vacancies),
+        loadComponent: () => import('./pages/vacantes/vacantes').then((m) => m.Vacancies),
         title: 'Oportunidades · TalentFlow360',
       },
       {
         path: 'vacantes/nueva',
         loadComponent: () =>
-          import('./features/vacancies/vacancy-create').then((m) => m.VacancyCreate),
+          import('./pages/crear-vacante/crear-vacante').then((m) => m.VacancyCreate),
         data: { roles: RECRUITERS },
         title: 'Crear vacante',
       },
       {
         path: 'vacantes/:id',
         loadComponent: () =>
-          import('./features/vacancies/vacancy-detail').then((m) => m.VacancyDetail),
+          import('./pages/detalle-vacante/detalle-vacante').then((m) => m.VacancyDetail),
         title: 'Detalle de oportunidad',
       },
       {
         path: 'perfil',
-        loadComponent: () => import('./features/profile/profile').then((m) => m.Profile),
+        loadComponent: () => import('./pages/perfil/perfil').then((m) => m.Profile),
         data: { roles: ['POSTULANTE'] },
         title: 'Mi perfil',
       },
       {
         path: 'postulaciones',
         loadComponent: () =>
-          import('./features/applications/applications').then((m) => m.Applications),
+          import('./pages/postulaciones/postulaciones').then((m) => m.Applications),
         title: 'Postulaciones',
       },
       {
         path: 'postulaciones/:id',
         loadComponent: () =>
-          import('./features/applications/application-detail').then((m) => m.ApplicationDetail),
+          import('./pages/detalle-postulacion/detalle-postulacion').then(
+            (m) => m.ApplicationDetail,
+          ),
         title: 'Seguimiento y matching',
       },
       {
         path: 'entrevistas',
-        loadComponent: () => import('./features/interviews/interviews').then((m) => m.Interviews),
+        loadComponent: () => import('./pages/entrevistas/entrevistas').then((m) => m.Interviews),
         data: { roles: STAFF },
         title: 'Agenda de entrevistas',
       },
       {
         path: 'evaluaciones',
-        loadComponent: () =>
-          import('./features/evaluations/evaluations').then((m) => m.Evaluations),
+        loadComponent: () => import('./pages/evaluaciones/evaluaciones').then((m) => m.Evaluations),
         data: { roles: ['EVALUADOR', 'COORDINADOR', 'ADMINISTRADOR'] },
         title: 'Evaluaciones',
       },
       {
         path: 'indicadores',
-        loadComponent: () => import('./features/dashboard/dashboard').then((m) => m.Dashboard),
+        loadComponent: () => import('./pages/indicadores/indicadores').then((m) => m.Dashboard),
         data: { roles: MANAGERS },
         title: 'Indicadores y trazabilidad',
       },
       {
         path: 'usuarios',
-        loadComponent: () => import('./features/users/users').then((m) => m.Users),
+        loadComponent: () => import('./pages/usuarios/usuarios').then((m) => m.Users),
         data: { roles: MANAGERS },
         title: 'Equipo y accesos',
       },
@@ -105,13 +107,13 @@ export const routes: Routes = [
   },
   {
     path: 'sin-acceso',
-    loadComponent: () => import('./features/errors/error-page').then((m) => m.ErrorPage),
+    loadComponent: () => import('./pages/no-encontrado/no-encontrado').then((m) => m.ErrorPage),
     data: { forbidden: true },
     title: 'Acceso restringido',
   },
   {
     path: '**',
-    loadComponent: () => import('./features/errors/error-page').then((m) => m.ErrorPage),
+    loadComponent: () => import('./pages/no-encontrado/no-encontrado').then((m) => m.ErrorPage),
     title: 'Página no encontrada',
   },
 ];

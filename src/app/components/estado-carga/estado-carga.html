@@ -1,0 +1,10 @@
+@if (loading()) {
+  <div class="state" role="status"><span class="loader"></span>Cargando información…</div>
+}
+@if (error()) {
+  <div class="state error" role="alert">
+    <strong>No pudimos completar la consulta</strong>
+    <p>{{ error() }}</p>
+    <button class="btn secondary" (click)="retry.emit()">Volver a intentar</button>
+  </div>
+}

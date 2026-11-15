@@ -1,0 +1,9 @@
+<div class="category-links">
+  @for (c of categories; track c.query) {
+    <a routerLink="/app/vacantes" [queryParams]="{ q: c.query }"
+      ><span [class]="'category-icon ' + c.color"><tf-icon [name]="c.icon" /></span
+      ><strong>{{ c.title }}</strong
+      ><span class="chevron">›</span></a
+    >
+  }
+</div>

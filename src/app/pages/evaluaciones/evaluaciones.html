@@ -1,0 +1,84 @@
+<header class="page-head">
+  <div>
+    <p class="eyebrow">CRITERIOS CLAROS, MEJORES DECISIONES</p>
+    <h1>Evaluar para acompañar.</h1>
+    <p>Registra una valoración profesional y ofrece retroalimentación con visibilidad explícita.</p>
+  </div>
+</header>
+<div class="filters">
+  <div class="field">
+    <label for="eval-scope">Consultar por</label
+    ><select id="eval-scope" [(ngModel)]="scope">
+      <option value="evaluador">Evaluador</option>
+      <option value="postulacion">Postulación</option>
+    </select>
+  </div>
+  <div class="field">
+    <label for="eval-id">ID de consulta</label
+    ><input id="eval-id" type="number" min="1" [(ngModel)]="lookupId" />
+  </div>
+  <button class="btn secondary" (click)="load()">Consultar evaluaciones</button>
+</div>
+<tf-async-state [loading]="loading()" [error]="error()" (retry)="load()" />
+<section class="panel table-wrap">
+  <table>
+    <thead>
+      <tr>
+        <th>Postulación</th>
+        <th>Evaluador</th>
+        <th>Puntaje</th>
+        <th>Fecha</th>
+        <th>Comentario</th>
+      </tr>
+    </thead>
+    <tbody>
+      @for (e of rows(); track e.id) {
+        <tr>
+          <td>#{{ e.postulacionId }}</td>
+          <td>{{ e.evaluadorNombre }}</td>
+          <td>{{ e.puntajeGeneral }}/100</td>
+          <td>{{ e.fechaEvaluacion | date: 'dd/MM/yyyy' }}</td>
+          <td>{{ e.comentarios }}</td>
+        </tr>
+      } @empty {
+        <tr>
+          <td colspan="5">No hay evaluaciones para esta consulta.</td>
+        </tr>
+      }
+    </tbody>
+  </table>
+</section>
+@if (actionError()) {
+  <p class="auth-message" role="alert">{{ actionError() }}</p>
+}
+@if (auth.has(reviewers)) {
+  <div class="grid-2 spaced">
+    <section class="panel">
+      <h2>Registrar evaluación</h2>
+      <tf-array-editor
+        label="criterio"
+        [fields]="criteriaFields"
+        (changed)="criteria.set($event)"
+      />
+      <hr />
+      <tf-data-form
+        prefix="evaluation"
+        [fields]="evaluationFields"
+        [busy]="busy()"
+        label="Guardar evaluación"
+        (submitted)="evaluate($event)"
+      />
+    </section>
+    <section class="panel">
+      <h2>Dar retroalimentación</h2>
+      <p>La opción de visibilidad habilita el comentario para el postulante.</p>
+      <tf-data-form
+        prefix="feedback"
+        [fields]="feedbackFields"
+        [busy]="busy()"
+        label="Registrar retroalimentación"
+        (submitted)="feedback($event)"
+      />
+    </section>
+  </div>
+}

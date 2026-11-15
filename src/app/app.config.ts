@@ -7,8 +7,8 @@ import {
 import { provideRouter, withInMemoryScrolling } from '@angular/router';
 import { provideHttpClient, withInterceptors } from '@angular/common/http';
 import { routes } from './app.routes';
-import { ApiConfig } from './core/api/api-config';
-import { authInterceptor } from './core/api/http-interceptors';
+import { ApiConfig } from './services/api-config.service';
+import { authInterceptor } from './interceptors/auth.interceptor';
 export const appConfig: ApplicationConfig = {
   providers: [
     provideBrowserGlobalErrorListeners(),

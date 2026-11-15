@@ -1,0 +1,60 @@
+<section
+  class="companies-section"
+  id="empresas"
+  aria-labelledby="companies-heading"
+  role="region"
+  aria-roledescription="carrusel"
+  (mouseenter)="hovered.set(true)"
+  (mouseleave)="hovered.set(false)"
+  (focusin)="focused.set(true)"
+  (focusout)="focused.set(false)"
+>
+  <h2 id="companies-heading">Conoce las empresas donde puede empezar tu futuro.</h2>
+  <p>Explora su actividad y conoce las oportunidades registradas en TalentFlow360.</p>
+  <div class="carousel-shell">
+    <button class="carousel-arrow previous" aria-label="Empresas anteriores" (click)="move(-1)">
+      <tf-icon name="arrow" />
+    </button>
+    <div #viewport class="carousel-viewport">
+      <div
+        class="carousel-track"
+        [class.animated]="animated()"
+        [style.--visible]="slots()"
+        [style.transform]="'translateX(-' + (index() * 100) / slots() + '%)'"
+        (transitionend)="finish($event)"
+      >
+        @for (company of slides; track $index; let i = $index) {
+          <div
+            class="company-slide"
+            [attr.aria-hidden]="i < index() || i >= index() + slots() ? 'true' : null"
+          >
+            <a
+              class="company-tile"
+              [routerLink]="['/empresas', company.slug]"
+              [attr.tabindex]="i < index() || i >= index() + slots() ? -1 : 0"
+              [attr.aria-label]="'Conocer ' + company.name"
+              ><tf-company-logo [company]="company" [eager]="true"
+            /></a>
+          </div>
+        }
+      </div>
+    </div>
+    <button class="carousel-arrow next" aria-label="Empresas siguientes" (click)="move(1)">
+      <tf-icon name="arrow" />
+    </button>
+  </div>
+  <div class="carousel-actions">
+    <a routerLink="/empresas" class="btn secondary"
+      ><tf-icon name="briefcase" />Ver todas las empresas</a
+    ><button
+      class="autoplay-toggle"
+      [attr.aria-label]="
+        playing() ? 'Pausar carrusel automático' : 'Reproducir carrusel automático'
+      "
+      [attr.aria-pressed]="!playing()"
+      (click)="playing.set(!playing())"
+    >
+      <tf-icon [name]="playing() ? 'pause' : 'play'" />
+    </button>
+  </div>
+</section>

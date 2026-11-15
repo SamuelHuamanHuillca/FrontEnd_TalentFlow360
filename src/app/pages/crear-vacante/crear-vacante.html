@@ -1,0 +1,27 @@
+<a class="back" routerLink="/app/vacantes">← Oportunidades</a>
+<header class="page-head">
+  <div>
+    <p class="eyebrow">CONECTA CON EL POTENCIAL</p>
+    <h1>Una oportunidad con claridad.</h1>
+    <p>Define primero los requisitos. La vacante se creará en borrador.</p>
+  </div>
+</header>
+<div class="grid-2">
+  <section class="panel">
+    <h2>Datos de la vacante</h2>
+    @if (error()) {
+      <p class="auth-message" role="alert">{{ error() }}</p>
+    }
+    <tf-data-form
+      [fields]="fields"
+      [busy]="busy()"
+      label="Crear borrador"
+      (submitted)="save($event)"
+    />
+  </section>
+  <section class="panel">
+    <h2>Requisitos profesionales</h2>
+    <p>Agrega al menos un requisito con peso positivo para obtener un matching explicable.</p>
+    <tf-array-editor [fields]="requirements" (changed)="items.set($event)" />
+  </section>
+</div>
