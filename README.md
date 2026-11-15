@@ -2,6 +2,12 @@
 
 Aplicación Angular 22 standalone, TypeScript estricto y SASS/SCSS para prácticas preprofesionales con matching explicable. Consume el backend Spring Boot existente. La aplicación normal **no tiene un modo demo ni sustituye respuestas de la API por datos inventados**. Los dobles de API solo están en `e2e/`.
 
+## Probar en el navegador
+
+[Abrir TalentFlow360](https://talentflow360-portal.outstandingjet1.chatgpt.site). La versión de prueba está publicada con acceso privado: usar la misma cuenta de ChatGPT con la que se creó este sitio. Dentro del portal, el login y el registro corresponden a las cuentas del backend TalentFlow360.
+
+El alojamiento entrega la compilación Angular, permite abrir directamente rutas como `/empresas` y reenvía `/api` al backend de Render. Esta publicación no carga registros ni incluye cuentas de demostración. La integración autenticada con datos reales sigue pendiente de cuentas de prueba autorizadas.
+
 ## Ejecutar
 
 Requisitos: Node 24.15 o posterior compatible con Angular 22 y npm 11. El proyecto fue validado con Node 24.19.0.

@@ -6,7 +6,7 @@ Validación local del 15/11/2026, tras reorganizar según el ejemplo de clase. N
 |---|---|
 | `npm run build` | Correcto. Bundle inicial 306,27 kB, transferencia estimada 84,67 kB, rutas diferidas |
 | `npm run test:unit` | 47 pruebas correctas, 5 archivos, sin errores no controlados |
-| `npm run test:e2e` | 21 recorridos correctos, 1 worker, 29 s aproximadamente |
+| `npm run test:e2e` | 21 recorridos correctos, 1 worker, 33,5 s |
 | `npm run format:check` | Correcto |
 | `git diff --check` | Sin errores de espacio en el contenido |
 | Inspección visual | Portada de escritorio y móvil, carrusel, directorio y ficha de empresas, oportunidades, matching y dashboard |
@@ -15,6 +15,7 @@ Validación local del 15/11/2026, tras reorganizar según el ejemplo de clase. N
 | Prueba de extremo a extremo con Render autenticado | Pendiente de cuenta de prueba autorizada |
 | Conteo de BD desplegada | Pendiente de ejecutar el inventario con acceso de lectura |
 | Suite del backend Java | No ejecutada en esta revisión |
+| Publicación del frontend | [Versión de prueba privada publicada el 15/11/2026](https://talentflow360-portal.outstandingjet1.chatgpt.site), con las páginas Angular y acceso al backend mediante `/api` |
 
 ## Qué verifican las pruebas
 
@@ -41,6 +42,8 @@ Los recorridos de navegador sustituyen `/api/**` por contratos aislados. Demuest
 - Los porcentajes sin observaciones se presentan con un guion en vez de afirmar que un cero cumple una meta.
 
 Tras trasladar las pantallas a `pages`, extraer plantillas/estilos, separar modelos por entidad y actualizar importaciones/rutas, se repitieron el build, las 47 pruebas unitarias y los 21 recorridos de navegador. Se conservan los recorridos de registro, perfil, selección, seguridad y empresas.
+
+Se verificó localmente el adaptador de publicación: rutas directas a portada, empresas, ficha, acceso y perfil; carga de configuración y logo; respuestas 404 para recursos ausentes; reenvío al backend con el token JWT y sin cookies del alojamiento; conservación de errores HTTP y ausencia de caché en la API. La publicación terminó correctamente en el servicio de alojamiento. Estas comprobaciones no sustituyen las pruebas autenticadas contra Render.
 
 ## Rediseño del portal
 
