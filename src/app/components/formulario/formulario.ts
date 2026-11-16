@@ -7,6 +7,10 @@ import {
   Validators,
 } from '@angular/forms';
 export type FormValue = Record<string, string | number | boolean | null>;
+export interface OptionItem {
+  value: string | number;
+  label: string;
+}
 export interface Field {
   key: string;
   label: string;
@@ -16,7 +20,7 @@ export interface Field {
   max?: number;
   minLength?: number;
   maxLength?: number;
-  options?: readonly string[];
+  options?: readonly (string | OptionItem)[];
   value?: string | number | boolean;
   hint?: string;
 }
@@ -92,13 +96,20 @@ export class DataForm {
                 ? 'El máximo es ' + f.max + '.'
                 : 'Revisa el formato de este campo.';
   }
+  isOption(o: string | OptionItem): o is OptionItem {
+    return typeof o === 'object' && o !== null && 'value' in o;
+  }
   submit(): void {
     this.form().markAllAsTouched();
     if (this.form().valid && !this.busy()) {
       const values = this.form().getRawValue();
       for (const field of this.fields()) {
         const value = values[field.key];
-        if (field.type === 'number')
+        const isNumericSelect =
+          field.options &&
+          field.options.some((opt) => this.isOption(opt) && typeof opt.value === 'number');
+
+        if (field.type === 'number' || isNumericSelect)
           values[field.key] = value === '' || value === null ? null : Number(value);
         else if (typeof value === 'string' && field.type !== 'password')
           values[field.key] = value.trim() || null;

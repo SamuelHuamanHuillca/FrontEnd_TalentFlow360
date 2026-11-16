@@ -27,6 +27,9 @@ export class Vacancies {
   readonly mode = signal('');
   readonly state = signal('');
   readonly page = signal(1);
+  readonly hasMore = signal(false);
+  private readonly pageSize = 9;
+  /** Filtros client-side sobre la página actual ya cargada desde el servidor */
   readonly filtered = computed(() =>
     this.jobs().filter(
       (v) =>
@@ -41,20 +44,38 @@ export class Vacancies {
           .includes(this.query().toLocaleLowerCase()),
     ),
   );
-  readonly visible = computed(() => this.filtered().slice((this.page() - 1) * 9, this.page() * 9));
-  readonly pages = computed(() => Math.max(1, Math.ceil(this.filtered().length / 9)));
   constructor() {
     this.load();
   }
   load() {
     this.loading.set(true);
     this.error.set('');
-    this.api
-      .vacancies()
+    this.api.client
+      .get<VacanteDTO[]>('/vacantes', { page: this.page() - 1, size: this.pageSize })
       .pipe(finalize(() => this.loading.set(false)))
-      .subscribe({ next: (v) => this.jobs.set(v), error: (e) => this.error.set(errorMessage(e)) });
+      .subscribe({
+        next: (v) => {
+          this.jobs.set(v);
+          this.hasMore.set(v.length === this.pageSize);
+        },
+        error: (e) => this.error.set(errorMessage(e)),
+      });
   }
+  /** Aplica un filtro nuevo → vuelve al inicio */
   reset() {
     this.page.set(1);
+    this.load();
+  }
+  prevPage() {
+    if (this.page() > 1) {
+      this.page.update((p) => p - 1);
+      this.load();
+    }
+  }
+  nextPage() {
+    if (this.hasMore()) {
+      this.page.update((p) => p + 1);
+      this.load();
+    }
   }
 }

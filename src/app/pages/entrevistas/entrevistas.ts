@@ -1,4 +1,4 @@
-import { Component, inject, signal } from '@angular/core';
+import { Component, computed, inject, signal } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { DatePipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -6,6 +6,7 @@ import { finalize } from 'rxjs';
 import { AuthStore, RECRUITERS } from '../../services/auth.service';
 import { TalentApi } from '../../services/talent-api.service';
 import { EntrevistaDTO, EstadoEntrevista } from '../../models/entrevista';
+import { UsuarioDTO } from '../../models/usuario';
 import { errorMessage } from '../../interceptors/auth.interceptor';
 import { NoticeStore } from '../../services/avisos.service';
 import { DataForm, Field, FormValue } from '../../components/formulario/formulario';
@@ -23,6 +24,7 @@ export class Interviews {
   private readonly route = inject(ActivatedRoute);
   private readonly notice = inject(NoticeStore);
   readonly recruiters = RECRUITERS;
+  readonly evaluadores = signal<UsuarioDTO[]>([]);
   readonly scope = signal(
     this.route.snapshot.queryParamMap.has('postulacion') ? 'postulacion' : 'evaluador',
   );
@@ -41,7 +43,7 @@ export class Interviews {
     'CANCELADA',
     'NO_ASISTIO',
   ];
-  readonly fields: Field[] = [
+  readonly fields = computed<Field[]>(() => [
     {
       key: 'postulacionId',
       label: 'ID de postulación',
@@ -50,7 +52,15 @@ export class Interviews {
       min: 1,
       value: Number(this.route.snapshot.queryParamMap.get('postulacion')) || '',
     },
-    { key: 'evaluadorId', label: 'ID del evaluador', type: 'number', required: true, min: 1 },
+    {
+      key: 'evaluadorId',
+      label: 'Evaluador asignado',
+      required: true,
+      options: this.evaluadores().map((e) => ({
+        value: e.id!,
+        label: `${e.nombre} ${e.apellido} (${e.email})`,
+      })),
+    },
     {
       key: 'fechaHoraInicio',
       label: 'Inicio de entrevista',
@@ -61,9 +71,16 @@ export class Interviews {
     { key: 'tipo', label: 'Tipo', options: ['VIRTUAL', 'PRESENCIAL'], required: true },
     { key: 'ubicacionOEnlace', label: 'Ubicación o enlace', required: true, maxLength: 300 },
     { key: 'notas', label: 'Notas', type: 'textarea', maxLength: 1000 },
-  ];
+  ]);
   constructor() {
+    this.cargarEvaluadores();
     this.load();
+  }
+  cargarEvaluadores() {
+    this.api.client.get<UsuarioDTO[]>('/usuarios/rol/EVALUADOR').subscribe({
+      next: (list) => this.evaluadores.set(list),
+      error: () => {},
+    });
   }
   load() {
     if (!(this.lookupId > 0)) {
@@ -82,6 +99,8 @@ export class Interviews {
       this.actionError.set('El fin de la entrevista debe ser posterior al inicio.');
       return;
     }
+    v['postulacionId'] = Number(v['postulacionId']);
+    v['evaluadorId'] = Number(v['evaluadorId']);
     this.busy.set(true);
     this.actionError.set('');
     this.api.client

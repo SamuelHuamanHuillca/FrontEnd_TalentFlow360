@@ -57,54 +57,60 @@
         <p>No hay evaluaciones registradas.</p>
       }
       <hr />
-      <h3>Tiempo reportado por la API</h3>
-      <div class="metric">
-        {{ d.tiempoPromedioRespuestaDias | number: '1.0-1' }} <small>días</small>
+      <h3>Resultados del proceso</h3>
+      <div class="row between" style="margin-bottom: 8px">
+        <span>Aceptados: <strong>{{ d.totalAceptados | number }}</strong> ({{ d.porcentajeAceptados | number: '1.0-1' }}%)</span>
+        <span>Rechazados: <strong>{{ d.totalRechazados | number }}</strong> ({{ d.porcentajeRechazados | number: '1.0-1' }}%)</span>
       </div>
-      <p class="help">
-        La versión actual del backend mide desde la postulación hasta el último cambio de estado.
-        I2.1 exige el primer cambio. Se debe corregir el cálculo con el historial antes de usarlo
-        como evidencia de ese indicador.
-      </p>
+      <hr />
+      <h3>Duración promedio por etapa</h3>
+      @for (st of d.duracionPromedioPorEtapaDias | keyvalue; track st.key) {
+        <div class="row between" style="padding: 4px 0; font-size: 0.9rem">
+          <tf-status [value]="st.key" />
+          <strong>{{ st.value | number: '1.0-1' }} días</strong>
+        </div>
+      }
     </section>
   </div>
   <section class="panel spaced">
-    <h2>Trazabilidad de la matriz</h2>
+    <div class="row between">
+      <div>
+        <h2>Historial de acciones y auditoría</h2>
+        <p>Registro cronológico de cambios de estado, evaluaciones e intentos de conflicto prevenidos.</p>
+      </div>
+      <span class="badge positive">Trazabilidad activa</span>
+    </div>
     <div class="table-wrap">
       <table>
         <thead>
           <tr>
-            <th>Indicador</th>
-            <th>Fuente necesaria</th>
-            <th>Disponibilidad en la API actual</th>
+            <th>Fecha / Hora</th>
+            <th>Evento</th>
+            <th>Detalle de la acción</th>
+            <th>Recurso afectado</th>
+            <th>Responsable</th>
+            <th>Estado</th>
           </tr>
         </thead>
         <tbody>
-          <tr>
-            <td>I3.2 / I3.3 · Matching reproducible</td>
-            <td>Detalle matching y justificación por requisito</td>
-            <td>Disponible por postulación, sin agregado global</td>
-          </tr>
-          <tr>
-            <td>I5.1 · Solapamientos activos</td>
-            <td>Agenda y participantes</td>
-            <td>Validación de agenda, sin indicador agregado</td>
-          </tr>
-          <tr>
-            <td>I5.2 · Intentos bloqueados</td>
-            <td>Evento persistido de conflicto</td>
-            <td>Pendiente de implementar en backend</td>
-          </tr>
-          <tr>
-            <td>I6.1 · Historial completo</td>
-            <td>Usuario, motivo y fecha por cambio</td>
-            <td>Historial por postulación, sin agregado global</td>
-          </tr>
-          <tr>
-            <td>I6.2 · Transiciones rechazadas</td>
-            <td>Evento persistido de rechazo</td>
-            <td>Pendiente de implementar en backend</td>
-          </tr>
+          @for (a of auditList(); track a.id) {
+            <tr>
+              <td>{{ a.fechaHora | date: 'dd/MM/yyyy HH:mm' }}</td>
+              <td><strong>{{ a.accion }}</strong></td>
+              <td>{{ a.detalle }}</td>
+              <td>{{ a.recursoAfectado }}</td>
+              <td>{{ a.usuarioResponsable }} ({{ a.usuarioRol }})</td>
+              <td>
+                <span class="badge" [class.positive]="a.exitoso">
+                  {{ a.exitoso ? 'Exitoso' : 'Bloqueado (Regla)' }}
+                </span>
+              </td>
+            </tr>
+          } @empty {
+            <tr>
+              <td colspan="6">No hay eventos de auditoría registrados en este periodo.</td>
+            </tr>
+          }
         </tbody>
       </table>
     </div>

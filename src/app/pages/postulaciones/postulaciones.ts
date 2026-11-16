@@ -13,7 +13,6 @@ import { Status } from '../../components/estado/estado';
 @Component({
   imports: [FormsModule, RouterLink, DatePipe, AsyncState, Status],
   templateUrl: './postulaciones.html',
-
   styleUrl: './postulaciones.scss',
 })
 export class Applications {
@@ -27,6 +26,14 @@ export class Applications {
   readonly error = signal('');
   readonly query = signal('');
   readonly page = signal(1);
+  readonly hasMore = signal(false);
+  private readonly pageSize = 15;
+  /** ¿Está activo el modo "todas las postulaciones paginadas"?
+   *  Solo para COORDINADOR / ADMINISTRADOR sin filtro de vacante seleccionado */
+  private get useServerPage(): boolean {
+    const role = this.auth.role();
+    return (role === 'COORDINADOR' || role === 'ADMINISTRADOR') && !this.vacancyId();
+  }
   readonly filtered = computed(() =>
     this.rows().filter((r) =>
       [r.postulanteNombre, r.vacanteTitulo]
@@ -34,9 +41,6 @@ export class Applications {
         .toLowerCase()
         .includes(this.query().toLowerCase()),
     ),
-  );
-  readonly visible = computed(() =>
-    this.filtered().slice((this.page() - 1) * 15, this.page() * 15),
   );
   constructor() {
     this.load();
@@ -57,7 +61,11 @@ export class Applications {
         });
     } else if (this.auth.role() === 'EVALUADOR') {
       this.loadScoped();
+    } else if (this.useServerPage) {
+      // COORDINADOR / ADMINISTRADOR sin vacante seleccionada → paginación server-side
+      this.loadAllPaged();
     } else {
+      // RECLUTADOR (o coord/admin con vacante ya seleccionada) → carga lista de vacantes
       this.loading.set(true);
       this.error.set('');
       this.api
@@ -78,6 +86,21 @@ export class Applications {
         });
     }
   }
+  /** Carga todas las postulaciones paginadas desde el servidor (COORDINADOR / ADMIN) */
+  loadAllPaged() {
+    this.loading.set(true);
+    this.error.set('');
+    this.api.client
+      .get<PostulacionDTO[]>('/postulaciones', { page: this.page() - 1, size: this.pageSize })
+      .pipe(finalize(() => this.loading.set(false)))
+      .subscribe({
+        next: (r) => {
+          this.rows.set(r);
+          this.hasMore.set(r.length === this.pageSize);
+        },
+        error: (e) => this.error.set(errorMessage(e)),
+      });
+  }
   loadScoped() {
     this.rows.set([]);
     this.page.set(1);
@@ -91,5 +114,17 @@ export class Applications {
       )
       .pipe(finalize(() => this.loading.set(false)))
       .subscribe({ next: (r) => this.rows.set(r), error: (e) => this.error.set(errorMessage(e)) });
+  }
+  prevPage() {
+    if (this.page() > 1) {
+      this.page.update((p) => p - 1);
+      this.loadAllPaged();
+    }
+  }
+  nextPage() {
+    if (this.hasMore()) {
+      this.page.update((p) => p + 1);
+      this.loadAllPaged();
+    }
   }
 }

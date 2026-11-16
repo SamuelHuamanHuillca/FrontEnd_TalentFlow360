@@ -8,12 +8,12 @@
 </header>
 <div class="filters">
   <div class="field search">
-    <label for="user-search">Buscar persona</label
-    ><input id="user-search" [ngModel]="query()" (ngModelChange)="query.set($event); page.set(1)" />
+    <label for="user-search">Buscar persona
+    </label><input id="user-search" [ngModel]="query()" (ngModelChange)="query.set($event)" />
   </div>
   <div class="field">
-    <label for="role-filter">Rol</label
-    ><select id="role-filter" [ngModel]="role()" (ngModelChange)="role.set($event); page.set(1)">
+    <label for="role-filter">Rol
+    </label><select id="role-filter" [ngModel]="role()" (ngModelChange)="role.set($event)">
       <option value="">Todos los roles</option>
       @for (r of roles; track r) {
         <option>{{ r }}</option>
@@ -34,7 +34,7 @@
       </tr>
     </thead>
     <tbody>
-      @for (u of visible(); track u.id) {
+      @for (u of filtered(); track u.id) {
         <tr>
           <td>
             <strong>{{ u.nombre }} {{ u.apellido }}</strong>
@@ -48,11 +48,7 @@
           </td>
           <td>
             <div class="row">
-              <span
-                class="muted"
-                title="El contrato PUT actual exige una contraseña que el servicio ignora. Requiere corrección en backend."
-                >Edición pendiente de API</span
-              >
+              <button class="btn quiet" (click)="edit(u)">Editar</button>
               @if (
                 auth.role() === 'ADMINISTRADOR' && u.activo && u.id !== auth.session()?.usuarioId
               ) {
@@ -69,14 +65,14 @@
     </tbody>
   </table>
   <div class="pagination">
-    <span>{{ filtered().length }} cuentas · Página {{ page() }}</span>
+    <span>{{ filtered().length }} en esta pág. · Pág. {{ page() }}{{ !hasMore() ? ' (última)' : '' }}</span>
     <div class="row">
-      <button class="btn secondary" [disabled]="page() === 1" (click)="page.set(page() - 1)">
+      <button class="btn secondary" [disabled]="page() === 1 || loading()" (click)="prevPage()">
         Anterior</button
       ><button
         class="btn secondary"
-        [disabled]="page() * 15 >= filtered().length"
-        (click)="page.set(page() + 1)"
+        [disabled]="!hasMore() || loading()"
+        (click)="nextPage()"
       >
         Siguiente
       </button>

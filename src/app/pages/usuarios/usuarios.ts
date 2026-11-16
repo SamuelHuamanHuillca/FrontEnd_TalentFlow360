@@ -11,7 +11,6 @@ import { DataForm, Field, FormValue } from '../../components/formulario/formular
 @Component({
   imports: [FormsModule, AsyncState, DataForm],
   templateUrl: './usuarios.html',
-
   styleUrl: './usuarios.scss',
 })
 export class Users {
@@ -27,6 +26,8 @@ export class Users {
   readonly query = signal('');
   readonly role = signal('');
   readonly page = signal(1);
+  readonly hasMore = signal(false);
+  private readonly pageSize = 15;
   readonly editing = signal<UsuarioDTO | null>(null);
   readonly confirm = signal<UsuarioDTO | null>(null);
   readonly showForm = signal(false);
@@ -46,9 +47,19 @@ export class Users {
             maxLength: 72,
           },
         ]
-      : []),
+      : [
+          {
+            key: 'password',
+            label: 'Nueva contraseña (opcional)',
+            type: 'password',
+            required: false,
+            minLength: 8,
+            maxLength: 72,
+          },
+        ]),
     { key: 'rol', label: 'Rol', required: true, options: ROLES },
   ]);
+  /** Filtro client-side sobre la página actual ya cargada desde el servidor */
   readonly filtered = computed(() =>
     this.rows().filter(
       (u) =>
@@ -59,9 +70,6 @@ export class Users {
           .includes(this.query().toLowerCase()),
     ),
   );
-  readonly visible = computed(() =>
-    this.filtered().slice((this.page() - 1) * 15, this.page() * 15),
-  );
   constructor() {
     this.load();
   }
@@ -69,9 +77,27 @@ export class Users {
     this.loading.set(true);
     this.error.set('');
     this.api.client
-      .get<UsuarioDTO[]>('/usuarios')
+      .get<UsuarioDTO[]>('/usuarios', { page: this.page() - 1, size: this.pageSize })
       .pipe(finalize(() => this.loading.set(false)))
-      .subscribe({ next: (u) => this.rows.set(u), error: (e) => this.error.set(errorMessage(e)) });
+      .subscribe({
+        next: (u) => {
+          this.rows.set(u);
+          this.hasMore.set(u.length === this.pageSize);
+        },
+        error: (e) => this.error.set(errorMessage(e)),
+      });
+  }
+  prevPage() {
+    if (this.page() > 1) {
+      this.page.update((p) => p - 1);
+      this.load();
+    }
+  }
+  nextPage() {
+    if (this.hasMore()) {
+      this.page.update((p) => p + 1);
+      this.load();
+    }
   }
   create() {
     this.editing.set(null);
@@ -85,25 +111,26 @@ export class Users {
       apellido: u.apellido ?? '',
       email: u.email ?? '',
       rol: u.rol ?? '',
+      password: '',
     });
     this.showForm.set(true);
   }
   save(v: FormValue) {
-    if (this.editing()) {
-      this.actionError.set(
-        'La API actual exige una contraseña al editar, aunque no la actualiza. Esta operación requiere corregir el DTO de actualización del backend.',
-      );
-      return;
-    }
     this.busy.set(true);
     this.actionError.set('');
-    this.api.client
-      .post('/usuarios', v)
-      .pipe(finalize(() => this.busy.set(false)))
+    const userToEdit = this.editing();
+    const req = userToEdit
+      ? this.api.client.put<UsuarioDTO>('/usuarios/' + userToEdit.id, v)
+      : this.api.client.post<UsuarioDTO>('/usuarios', v);
+
+    req.pipe(finalize(() => this.busy.set(false)))
       .subscribe({
         next: () => {
           this.showForm.set(false);
-          this.notice.show('Cuenta guardada.');
+          this.editing.set(null);
+          this.notice.show(
+            userToEdit ? 'Cuenta actualizada correctamente.' : 'Cuenta guardada con éxito.',
+          );
           this.load();
         },
         error: (e) => this.actionError.set(errorMessage(e)),

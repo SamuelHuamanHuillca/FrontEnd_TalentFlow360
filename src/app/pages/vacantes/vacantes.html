@@ -10,8 +10,8 @@
 </header>
 <section class="filters">
   <div class="field">
-    <label for="job-location">Lugar de trabajo</label
-    ><select
+    <label for="job-location">Lugar de trabajo
+    </label><select
       id="job-location"
       [ngModel]="location()"
       (ngModelChange)="location.set($event); reset()"
@@ -24,17 +24,17 @@
     </select>
   </div>
   <div class="field search">
-    <label for="job-search">Puesto, empresa o lugar</label
-    ><input
+    <label for="job-search">Puesto, empresa o lugar
+    </label><input
       id="job-search"
       placeholder="¿Cuál será tu siguiente paso?"
       [ngModel]="query()"
-      (ngModelChange)="query.set($event); reset()"
+      (ngModelChange)="query.set($event)"
     />
   </div>
   <div class="field">
-    <label for="mode">Modalidad</label
-    ><select id="mode" [ngModel]="mode()" (ngModelChange)="mode.set($event); reset()">
+    <label for="mode">Modalidad
+    </label><select id="mode" [ngModel]="mode()" (ngModelChange)="mode.set($event); reset()">
       <option value="">Todas las modalidades</option>
       <option>HIBRIDO</option>
       <option>REMOTO</option>
@@ -43,8 +43,8 @@
   </div>
   @if (auth.has(recruiters)) {
     <div class="field">
-      <label for="state">Estado</label
-      ><select id="state" [ngModel]="state()" (ngModelChange)="state.set($event); reset()">
+      <label for="state">Estado
+      </label><select id="state" [ngModel]="state()" (ngModelChange)="state.set($event); reset()">
         <option value="">Todos los estados</option>
         @for (s of ['BORRADOR', 'PUBLICADA', 'EN_PROCESO', 'CERRADA', 'CANCELADA']; track s) {
           <option>{{ s }}</option>
@@ -56,11 +56,11 @@
 <tf-async-state [loading]="loading()" [error]="error()" (retry)="load()" />
 @if (!loading() && !error()) {
   <div class="row between results">
-    <span>{{ filtered().length }} oportunidades encontradas</span
+    <span>{{ filtered().length }} en esta página · Pág. {{ page() }}</span
     ><span>Requisitos profesionales y explícitos</span>
   </div>
   <div class="jobs-grid">
-    @for (job of visible(); track job.id) {
+    @for (job of filtered(); track job.id) {
       <a class="job-card" [routerLink]="['/app/vacantes', job.id]"
         ><div class="row between">
           <span class="company-avatar">{{
@@ -87,11 +87,11 @@
     }
   </div>
   <div class="pagination">
-    <span>Página {{ page() }} de {{ pages() }}</span>
+    <span>Página {{ page() }}{{ !hasMore() ? ' (última)' : '' }}</span>
     <div class="row">
-      <button class="btn secondary" [disabled]="page() === 1" (click)="page.set(page() - 1)">
+      <button class="btn secondary" [disabled]="page() === 1 || loading()" (click)="prevPage()">
         Anterior</button
-      ><button class="btn secondary" [disabled]="page() >= pages()" (click)="page.set(page() + 1)">
+      ><button class="btn secondary" [disabled]="!hasMore() || loading()" (click)="nextPage()">
         Siguiente
       </button>
     </div>

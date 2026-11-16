@@ -1,19 +1,21 @@
 import { Component, computed, inject, signal } from '@angular/core';
-import { DecimalPipe, KeyValuePipe } from '@angular/common';
+import { DatePipe, DecimalPipe, KeyValuePipe } from '@angular/common';
 import { finalize } from 'rxjs';
 import { TalentApi } from '../../services/talent-api.service';
 import { DashboardDTO } from '../../models/indicador';
+import { AuditoriaEventoDTO } from '../../models/auditoria';
 import { errorMessage } from '../../interceptors/auth.interceptor';
 import { AsyncState } from '../../components/estado-carga/estado-carga';
 import { Status } from '../../components/estado/estado';
 @Component({
-  imports: [DecimalPipe, KeyValuePipe, AsyncState, Status],
+  imports: [DecimalPipe, KeyValuePipe, DatePipe, AsyncState, Status],
   templateUrl: './indicadores.html',
   styleUrl: './indicadores.scss',
 })
 export class Dashboard {
   private readonly api = inject(TalentApi);
   readonly data = signal<DashboardDTO | null>(null);
+  readonly auditList = signal<AuditoriaEventoDTO[]>([]);
   readonly loading = signal(false);
   readonly error = signal('');
   readonly loadedAt = signal('');
@@ -36,15 +38,24 @@ export class Dashboard {
             value: d.totalPostulantes ? d.promedioCompletitud : undefined,
             unit: '%',
             base: 'Seis apartados del perfil',
-            target: 'Promedio del servidor',
+            target: 'Promedio global',
             met: !!d.totalPostulantes,
+          },
+          {
+            code: 'I2.1',
+            label: 'Primer cambio de estado',
+            value: d.totalPostulaciones ? d.tiempoPromedioPrimerCambioDias : undefined,
+            unit: 'días',
+            base: 'Línea base: 12 días',
+            target: 'Meta ≤ 5 días',
+            met: !!d.totalPostulaciones && (d.tiempoPromedioPrimerCambioDias ?? 99) <= 5,
           },
           {
             code: 'I2.2',
             label: 'Sin seguimiento',
             value: d.totalPostulaciones ? d.porcentajeSinSeguimiento : undefined,
             unit: '%',
-            base: 'Estado pendiente de revisión',
+            base: 'Estado pendiente',
             target: 'Meta ≤ 10%',
             met: !!d.totalPostulaciones && (d.porcentajeSinSeguimiento ?? 101) <= 10,
           },
@@ -64,6 +75,15 @@ export class Dashboard {
                 (d.distribucionEstadoPostulaciones?.['ACEPTADO'] || 0) +
                 (d.distribucionEstadoPostulaciones?.['RECHAZADO'] || 0)
               ) && (d.porcentajeSinRetroalimentacion ?? 101) <= 10,
+          },
+          {
+            code: 'I5.2',
+            label: 'Conflictos prevenidos',
+            value: d.intentosConflictosBloqueados ?? 0,
+            unit: 'bloqueos',
+            base: 'Regla 30: Sin solapes',
+            target: '100% prevenidos',
+            met: true,
           },
         ]
       : [];
@@ -86,6 +106,11 @@ export class Dashboard {
         },
         error: (e) => this.error.set(errorMessage(e)),
       });
+
+    this.api.auditEvents(0, 20).subscribe({
+      next: (events) => this.auditList.set(events),
+      error: () => {},
+    });
   }
   maxStage() {
     return Math.max(1, ...Object.values(this.data()?.distribucionEstadoPostulaciones ?? {}));

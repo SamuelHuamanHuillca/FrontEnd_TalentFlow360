@@ -65,4 +65,8 @@ export class TalentApi {
   dashboard() {
     return this.client.get<M.DashboardDTO>('/dashboard');
   }
+  auditEvents(page?: number, size?: number) {
+    const params = page !== undefined && size !== undefined ? { page, size } : undefined;
+    return this.client.get<M.AuditoriaEventoDTO[]>('/auditoria', params);
+  }
 }

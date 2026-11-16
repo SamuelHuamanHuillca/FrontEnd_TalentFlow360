@@ -14,8 +14,8 @@
 @if (auth.role() !== 'POSTULANTE' && auth.role() !== 'EVALUADOR') {
   <div class="filters">
     <div class="field">
-      <label for="vacancy-scope">Selecciona una vacante</label
-      ><select
+      <label for="vacancy-scope">Selecciona una vacante
+      </label><select
         id="vacancy-scope"
         [ngModel]="vacancyId()"
         (ngModelChange)="vacancyId.set(+$event); loadScoped()"
@@ -30,8 +30,8 @@
 }
 <div class="filters">
   <div class="field">
-    <label for="application-search">Buscar en los resultados</label
-    ><input
+    <label for="application-search">Buscar en los resultados
+    </label><input
       id="application-search"
       placeholder="Nombre o vacante"
       [ngModel]="query()"
@@ -54,7 +54,7 @@
         </tr>
       </thead>
       <tbody>
-        @for (a of visible(); track a.id) {
+        @for (a of filtered(); track a.id) {
           <tr>
             <td>
               <strong>{{ a.postulanteNombre }}</strong>
@@ -81,14 +81,18 @@
       </tbody>
     </table>
     <div class="pagination">
-      <span>{{ filtered().length }} postulaciones · Página {{ page() }}</span>
+      <span>{{ filtered().length }} postulaciones · Pág. {{ page() }}{{ !hasMore() && page() > 1 ? ' (última)' : '' }}</span>
       <div class="row">
-        <button class="btn secondary" [disabled]="page() === 1" (click)="page.set(page() - 1)">
+        <button
+          class="btn secondary"
+          [disabled]="page() === 1 || loading()"
+          (click)="prevPage()"
+        >
           Anterior</button
         ><button
           class="btn secondary"
-          [disabled]="page() * 15 >= filtered().length"
-          (click)="page.set(page() + 1)"
+          [disabled]="!hasMore() || loading()"
+          (click)="nextPage()"
         >
           Siguiente
         </button>

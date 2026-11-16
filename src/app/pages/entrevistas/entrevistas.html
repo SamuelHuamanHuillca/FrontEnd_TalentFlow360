@@ -17,14 +17,24 @@
   </div>
   <div class="field">
     <label for="interview-id">{{
-      scope() === 'evaluador' ? 'Evaluador de consulta (ID)' : 'Postulación de consulta (ID)'
-    }}</label><input
-      id="interview-id"
-      type="number"
-      min="1"
-      [(ngModel)]="lookupId"
-      [disabled]="auth.role() === 'EVALUADOR' && scope() === 'evaluador'"
-    />
+      scope() === 'evaluador' ? 'Evaluador de consulta' : 'Postulación de consulta (ID)'
+    }}</label>
+    @if (scope() === 'evaluador' && auth.role() !== 'EVALUADOR' && evaluadores().length > 0) {
+      <select id="interview-id" [(ngModel)]="lookupId">
+        <option [value]="0">Selecciona un evaluador</option>
+        @for (ev of evaluadores(); track ev.id) {
+          <option [value]="ev.id">{{ ev.nombre }} {{ ev.apellido }}</option>
+        }
+      </select>
+    } @else {
+      <input
+        id="interview-id"
+        type="number"
+        min="1"
+        [(ngModel)]="lookupId"
+        [disabled]="auth.role() === 'EVALUADOR' && scope() === 'evaluador'"
+      />
+    }
   </div>
   <button class="btn secondary" (click)="load()">Consultar agenda</button>
 </div>
@@ -79,7 +89,7 @@
       Horarios expresados en la zona local del proceso. Evita cruces entre postulante y evaluador.
     </p>
     <tf-data-form
-      [fields]="fields"
+      [fields]="fields()"
       [busy]="busy()"
       label="Agendar entrevista"
       (submitted)="schedule($event)"

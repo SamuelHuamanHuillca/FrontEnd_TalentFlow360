@@ -7,3 +7,4 @@ export type * from './postulacion';
 export type * from './entrevista';
 export type * from './evaluacion';
 export type * from './indicador';
+export type * from './auditoria';

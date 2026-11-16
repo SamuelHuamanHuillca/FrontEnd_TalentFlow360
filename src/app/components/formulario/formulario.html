@@ -15,8 +15,10 @@
           [attr.aria-describedby]="prefix() + '-' + f.key + '-help'"
         >
           <option value="">Selecciona una opción</option>
-          @for (o of f.options; track o) {
-            <option [value]="o">{{ o.replaceAll('_', ' ') }}</option>
+          @for (o of f.options; track isOption(o) ? o.value : o) {
+            <option [value]="isOption(o) ? o.value : o">
+              {{ isOption(o) ? o.label : o.replaceAll('_', ' ') }}
+            </option>
           }
         </select>
       } @else if (f.type === 'textarea') {
