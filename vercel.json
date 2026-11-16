@@ -3,11 +3,11 @@
   "outputDirectory": "dist/frontend-talentflow360/browser",
   "rewrites": [
     {
-      "source": "/api/(.*)",
-      "destination": "https://bakend-talentflow360.onrender.com/api/$1"
+      "source": "/api/:path*",
+      "destination": "https://bakend-talentflow360.onrender.com/api/:path*"
     },
     {
-      "source": "/(.*)",
+      "source": "/((?!api/).*)",
       "destination": "/index.html"
     }
   ]

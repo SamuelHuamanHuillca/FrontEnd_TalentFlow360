@@ -21,10 +21,21 @@ export function jwtExpiry(token: string): number {
     return 0;
   }
 }
+function loadStoredSession(): AuthResponseDTO | null {
+  try {
+    const raw = sessionStorage.getItem('tf360_session');
+    if (!raw) return null;
+    const s = JSON.parse(raw) as AuthResponseDTO;
+    if (s?.token && jwtExpiry(s.token) > Date.now()) return s;
+    sessionStorage.removeItem('tf360_session');
+    return null;
+  } catch {
+    return null;
+  }
+}
 @Injectable({ providedIn: 'root' })
 export class AuthStore {
-  // A memory-only token reduces persistence/exposure. Refreshing the page requires a new login.
-  readonly session = signal<AuthResponseDTO | null>(null);
+  readonly session = signal<AuthResponseDTO | null>(loadStoredSession());
   readonly authenticated = computed(
     () => !!this.session()?.token && jwtExpiry(this.session()!.token!) > Date.now(),
   );
@@ -46,8 +57,14 @@ export class AuthStore {
     )
       throw new Error('La API devolvió una sesión inválida.');
     this.session.set(session);
+    try {
+      sessionStorage.setItem('tf360_session', JSON.stringify(session));
+    } catch {}
   }
   clear(): void {
     this.session.set(null);
+    try {
+      sessionStorage.removeItem('tf360_session');
+    } catch {}
   }
 }
